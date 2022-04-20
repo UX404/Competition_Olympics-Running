@@ -6,7 +6,15 @@ from abc import ABC, abstractmethod
 
 
 class Game(ABC):
-    def __init__(self, n_player, is_obs_continuous, is_act_continuous, game_name, agent_nums, obs_type):
+    def __init__(
+        self,
+        n_player,
+        is_obs_continuous,
+        is_act_continuous,
+        game_name,
+        agent_nums,
+        obs_type,
+    ):
         self.n_player = n_player
         self.current_state = None
         self.all_observes = None

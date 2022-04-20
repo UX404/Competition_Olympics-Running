@@ -1,5 +1,6 @@
 import sys
 from os import path
+
 father_path = path.dirname(__file__)
 sys.path.append(str(father_path))
 from generator import create_scenario
@@ -14,21 +15,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 
+
 def store(record, name):
-    with open('logs/'+name+'.json', 'w') as f:
+    with open("logs/" + name + ".json", "w") as f:
         f.write(json.dumps(record))
+
 
 def load_record(path):
     file = open(path, "rb")
     filejson = json.load(file)
     return filejson
 
+
 RENDER = True
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--map', default="map4", type=str,
-                        help= "map1/map2/map3/map4")
+    parser.add_argument("--map", default="map4", type=str, help="map1/map2/map3/map4")
     parser.add_argument("--seed", default=1, type=int)
     args = parser.parse_args()
 
@@ -38,18 +41,18 @@ if __name__ == "__main__":
     agent1 = random_agent()
     agent2 = random_agent()
 
-    map_index_seq = list(range(1,5))
+    map_index_seq = list(range(1, 5))
     time_s = time.time()
     for i in range(20):
         print("==========================================")
         ind = map_index_seq.pop(0)
         print("map index: ", ind)
-        Gamemap = create_scenario("map"+str(ind))
+        Gamemap = create_scenario("map" + str(ind))
         map_index_seq.append(ind)
 
         rnd_seed = random.randint(0, 1000)
-        game = Running(Gamemap, seed = rnd_seed)
-        game.map_num =ind
+        game = Running(Gamemap, seed=rnd_seed)
+        game.map_num = ind
 
         obs = game.reset()
         if RENDER:
@@ -58,7 +61,7 @@ if __name__ == "__main__":
         done = False
         step = 0
         if RENDER:
-            game.render('MAP {}'.format(ind))
+            game.render("MAP {}".format(ind))
 
         while not done:
             step += 1
@@ -71,5 +74,4 @@ if __name__ == "__main__":
             if RENDER:
                 game.render()
 
-        print('Episode Reward = {}'.format(reward))
-
+        print("Episode Reward = {}".format(reward))
