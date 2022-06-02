@@ -20,11 +20,15 @@ def make_logpath(game_name, algo):
         ]
         if len(exst_run_nums) == 0:
             curr_run = "run1"
+            curr_run_o = "o_run1"
         else:
             curr_run = "run%i" % (max(exst_run_nums) + 1)
+            curr_run_o = "o_run%i" % (max(exst_run_nums) + 1)
     run_dir = model_dir / curr_run
     log_dir = run_dir
-    return run_dir, log_dir
+    run_dir_o = model_dir / curr_run_o
+    log_dir_o = run_dir_o
+    return run_dir, log_dir, run_dir_o, log_dir_o
 
 
 def save_config(args, save_path):

@@ -128,7 +128,7 @@ if __name__ == "__main__":
     parser.add_argument("--opponent", default="random", help="[your algo name]/random")
     parser.add_argument("--opponent_run_dir", default="")
     parser.add_argument("--opponent_run_episode", default=0)
-    parser.add_argument("--episode", default=20)
+    parser.add_argument("--episode", default=197)
     parser.add_argument(
         "--map",
         default="all",

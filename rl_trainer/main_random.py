@@ -136,7 +136,7 @@ def main(args):
 
     setup_seed(args.seed)
 
-    run_dir, log_dir, run_dir_o, log_dir_o = make_logpath(args.game_name, args.algo)
+    run_dir, log_dir, _, _ = make_logpath(args.game_name, args.algo)
 
     print(f"store in {run_dir}")
     if not args.load_model:
@@ -151,17 +151,6 @@ def main(args):
             )
         )
         save_config(args, log_dir)
-        writer_o = SummaryWriter(
-            os.path.join(
-                str(log_dir_o),
-                "{}_{} on map {}".format(
-                    datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
-                    args.algo,
-                    "all" if args.shuffle_map else args.map,
-                ),
-            )
-        )
-        save_config(args, log_dir_o)
 
     record_win = deque(maxlen=100)
     record_win_op = deque(maxlen=100)
@@ -178,12 +167,8 @@ def main(args):
             "Transition",
             ["state", "action", "a_log_prob", "reward", "next_state", "done"],
         )
-        model_o = PPO(args.device, run_dir_o, writer_o)
-        Transition = namedtuple(
-            "Transition",
-            ["state", "action", "a_log_prob", "reward", "next_state", "done"],
-        )
-    # opponent_agent = random_agent()  # we use random opponent agent here
+
+    opponent_agent = random_agent()  # we use random opponent agent here
 
     episode = 0
     train_count = 0
@@ -202,32 +187,27 @@ def main(args):
         if args.render:
             env.env_core.render()
         obs_ctrl_agent = np.array(state[ctrl_agent_index]["obs"]).flatten()
-        obs_oppo_agent = np.array(state[1 - ctrl_agent_index]["obs"]).flatten()
-        # obs_oppo_agent = state[1 - ctrl_agent_index]["obs"]
+        obs_oppo_agent = state[1 - ctrl_agent_index]["obs"]
 
         episode += 1
         step = 0
         Gt = 0
 
         while True:
-            # action_opponent = opponent_agent.choose_action(
-            #     obs_oppo_agent
-            # )  # opponent action
+            action_opponent = opponent_agent.choose_action(
+                obs_oppo_agent
+            )  # opponent action
             # action_opponent = [
             #     [0],
             #     [0],
             # ]  # here we assume the opponent is not moving in the demo
+
             action_ctrl_raw, action_prob = model.select_action(
                 obs_ctrl_agent, False if args.load_model else True
-            )
-            action_opponent_raw, action_opponent_prob = model.select_action(
-                obs_oppo_agent, False if args.load_model else True
             )
             # inference
             action_ctrl = actions_map[action_ctrl_raw]
             action_ctrl = [[action_ctrl[0]], [action_ctrl[1]]]  # wrapping up the action
-            action_opponent = actions_map[action_opponent_raw]
-            action_opponent = [[action_opponent[0]], [action_opponent[1]]]  # wrapping up the action
 
             action = (
                 [action_opponent, action_ctrl]
@@ -264,18 +244,8 @@ def main(args):
                     done,
                 )
                 model.store_transition(trans)
-                trans_o = Transition(
-                    obs_oppo_agent,
-                    action_opponent_raw,
-                    action_opponent_prob,
-                    post_reward[1 - ctrl_agent_index],
-                    next_obs_oppo_agent,
-                    done,
-                )
-                model_o.store_transition(trans_o)
 
-            # obs_oppo_agent = next_obs_oppo_agent
-            obs_oppo_agent = np.array(next_obs_oppo_agent).flatten()
+            obs_oppo_agent = next_obs_oppo_agent
             obs_ctrl_agent = np.array(next_obs_ctrl_agent).flatten()
             if args.render:
                 env.env_core.render()
@@ -296,7 +266,7 @@ def main(args):
                 episode_reward.append(Gt)
                 win_rate.append(sum(record_win) / len(record_win))
                 win_rate_opponent.append(sum(record_win_op) / len(record_win_op))
-
+                
                 if not args.load_model:
                     if args.algo == "ppo" and len(model.buffer) >= model.batch_size:
                         if win_is == 1:
@@ -311,7 +281,6 @@ def main(args):
         if episode % args.save_interval == 0 and not args.load_model:
             logger.info('Model saved')
             model.save(run_dir, episode)
-            model_o.save(run_dir_o, episode)
             np.save(str(run_dir)+'/reward.npy', np.array(episode_reward))
             np.save(str(run_dir)+'/rate.npy', np.array(win_rate))
             np.save(str(run_dir)+'/rate_o.npy', np.array(win_rate_opponent))
