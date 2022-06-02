@@ -12,6 +12,7 @@ def make_logpath(game_name, algo):
     model_dir = base_dir / Path("models") / game_name / algo
     if not model_dir.exists():
         curr_run = "run1"
+        curr_run_o = "o_run1"
     else:
         exst_run_nums = [
             int(str(folder.name).split("run")[1])

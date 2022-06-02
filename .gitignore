@@ -3,6 +3,7 @@ __pycache__
 logs/
 olympics/test/.pytest_cache/
 rl_trainer/models
+command.txt
 
 assets/.DS_Store
 .DS_Store

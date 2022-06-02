@@ -34,3 +34,7 @@ PPO-random  run5
 | score | 16.24  | 37.06 |
 |  win  |  32.0  | 73.0  |
 +-------+--------+-------+
+
+
+PPO-PPO  run15
+python evaluation.py --my_ai ppo --my_ai_run_dir run15 --opponent ppo --opponent_run_dir o_run15 --map 1

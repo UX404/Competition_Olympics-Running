@@ -15,6 +15,9 @@ python rl_trainer/main.py --device cuda --map 1
 
 # evaluating ppo with random opponent
 python evaluation.py --my_ai ppo --my_ai_run_dir run1 --my_ai_run_episode 1500 --map 1
+
+# evaluating ppo with ppo
+python evaluation.py --my_ai ppo --my_ai_run_dir run15 --opponent ppo --opponent_run_dir o_run15 --map 1
 ```
 
 ### Suggestions
