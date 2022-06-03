@@ -21,6 +21,7 @@ from env.chooseenv import make
 
 from rl_trainer.algo.ppo import PPO
 from rl_trainer.algo.random import random_agent
+from rl_trainer.algo.sacrificing_model import PPO_sacrifice
 from rl_trainer.log_path import *
 
 actions_map = {
@@ -173,8 +174,9 @@ def main(args):
         load_dir = os.path.join(os.path.dirname(run_dir), "run" + str(args.load_run))
         model.load(load_dir, episode=args.load_episode)
     else:
-        model = PPO(args.device, run_dir, writer)
-        model_o = PPO(args.device, run_dir_o, writer_o)
+        alliance = PPO_sacrifice(args.device, run_dir, writer, run_dir_o, writer_o)
+        model = alliance.model
+        model_o = alliance.model_o
         Transition = namedtuple(
             "Transition",
             ["state", "action", "a_log_prob", "reward", "next_state", "done"],
@@ -296,8 +298,8 @@ def main(args):
                 if not args.load_model:
                     if args.algo == "ppo" and len(model.buffer) >= model.batch_size:
                         if win_is == 1:
-                            model.update(episode)
-                            model_o.update(episode)
+                            advantage_o, gt_o = model_o.update(episode)
+                            model.update(episode, advantage_o, gt_o)
                             train_count += 1
                         else:
                             model.clear_buffer()
@@ -307,12 +309,13 @@ def main(args):
 
                 break
         if episode % args.save_interval == 0 and not args.load_model:
-            logger.info('Model saved')
+            # alliance.sacrifice()
             model.save(run_dir, episode)
             model_o.save(run_dir_o, episode)
             np.save(str(run_dir)+'/reward.npy', np.array(episode_reward))
             np.save(str(run_dir)+'/rate.npy', np.array(win_rate))
             np.save(str(run_dir)+'/rate_o.npy', np.array(win_rate_opponent))
+            logger.info('Model saved')
 
 
 if __name__ == "__main__":

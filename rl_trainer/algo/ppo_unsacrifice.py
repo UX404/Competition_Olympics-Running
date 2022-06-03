@@ -33,7 +33,7 @@ class Args:
 args = Args()
 
 
-class PPO:
+class PPO_UNS:
     clip_param = args.clip_param
     max_grad_norm = args.max_grad_norm
     ppo_update_time = args.ppo_update_time
@@ -53,7 +53,7 @@ class PPO:
         writer: SummaryWriter = None,
         use_gae: bool = True,
     ):
-        super(PPO, self).__init__()
+        super(PPO_UNS, self).__init__()
         self.args = args
         if self.use_cnn:
             self.actor_net = CNN_Actor(self.state_space, self.action_space)
@@ -103,7 +103,7 @@ class PPO:
         self.buffer.append(transition)
         self.counter += 1
 
-    def update(self, ep_i):
+    def update(self, ep_i, opponent_advantage, opponent_gt):
         state = torch.tensor([t.state for t in self.buffer], dtype=torch.float).to(
             self.device
         )
@@ -167,7 +167,7 @@ class PPO:
                 Gt_buffer.append(Gt_index)
 
                 # update actor network
-                action_loss = -torch.min(surr1, surr2).mean()  # MAX->MIN desent
+                action_loss = -(torch.min(surr1, surr2) - opponent_advantage[i].detach()).mean()  # MAX->MIN desent
                 self.actor_optimizer.zero_grad()
                 action_loss.backward()
                 nn.utils.clip_grad_norm_(
@@ -176,7 +176,7 @@ class PPO:
                 self.actor_optimizer.step()
 
                 # update critic network
-                value_loss = F.mse_loss(Gt_index, V)
+                value_loss = F.mse_loss(Gt_index - opponent_gt[i].detach(), V)
                 self.critic_net_optimizer.zero_grad()
                 value_loss.backward()
                 nn.utils.clip_grad_norm_(

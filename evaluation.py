@@ -111,8 +111,8 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
     print(tabulate(data, headers=header, tablefmt="pretty"))
 
 
-algo_name_list = ["ppo", "random"]
-algo_list = [PPO, random_agent]
+algo_name_list = ["ppo", "random", "ppo_uns"]
+algo_list = [PPO, random_agent, PPO_UNS]
 algo_map = dict(zip(algo_name_list, algo_list))
 
 if __name__ == "__main__":
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     parser.add_argument("--opponent", default="random", help="[your algo name]/random")
     parser.add_argument("--opponent_run_dir", default="")
     parser.add_argument("--opponent_run_episode", default=800)
-    parser.add_argument("--episode", default=197)
+    parser.add_argument("--episode", default=200)
     parser.add_argument(
         "--map",
         default="all",

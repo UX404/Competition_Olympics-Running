@@ -11,10 +11,16 @@ git clone https://github.com/Leo-xh/Competition_Olympics-Running.git
 cd Competition_Olympics-Running
 
 # training ppo with random opponent
-python rl_trainer/main.py --device cuda --map 1
+python rl_trainer/main_random.py --device cuda --shuffle_map
+
+# training ppo with ppo
+python rl_trainer/main.py --device cuda --shuffle_map
+
+# training ppo with sacrificing ppo
+python rl_trainer/main_sacrifice.py --device cuda --shuffle_map
 
 # evaluating ppo with random opponent
-python evaluation.py --my_ai ppo --my_ai_run_dir run1 --my_ai_run_episode 1500 --map 1
+python evaluation.py --my_ai ppo --my_ai_run_dir run5 --my_ai_run_episode 800 --map 1
 
 # evaluating ppo with ppo
 python evaluation.py --my_ai ppo --my_ai_run_dir run15 --opponent ppo --opponent_run_dir o_run15 --map 1
