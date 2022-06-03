@@ -121,7 +121,7 @@ if __name__ == "__main__":
         "--my_ai",
         default="ppo",
         help="[your algo name]/random",
-        choices=["ppo", "random"],
+        choices=["ppo", "random", "ppo_uns"],
     )
     parser.add_argument("--my_ai_run_dir", default="")
     parser.add_argument("--my_ai_run_episode", default=800)

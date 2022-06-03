@@ -164,7 +164,7 @@ def main(args):
         load_dir = os.path.join(os.path.dirname(run_dir), "run" + str(args.load_run))
         model.load(load_dir, episode=args.load_episode)
     else:
-        model = PPO(args.device, run_dir, writer)
+        model = DQN(args.device, run_dir, writer)
         Transition = namedtuple(
             "Transition",
             ["state", "action", "a_log_prob", "reward", "next_state", "done"],
