@@ -91,7 +91,7 @@ def get_args():
         choices=algo_name_list,
     )
 
-    parser.add_argument("--max_episodes", default=800, type=int)
+    parser.add_argument("--max_episodes", default=1200, type=int)
     parser.add_argument("--episode_length", default=500, type=int)
     parser.add_argument(
         "--map", default=1, type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -100,7 +100,7 @@ def get_args():
 
     parser.add_argument("--seed", default=1, type=int)
     parser.add_argument("--device", default="cpu", type=str, choices=["cpu", "cuda"])
-    parser.add_argument("--save_interval", default=50, type=int)
+    parser.add_argument("--save_interval", default=100, type=int)
     parser.add_argument("--render", action="store_true")
 
     parser.add_argument("--load_model", action="store_true")
@@ -309,7 +309,7 @@ def main(args):
 
                 break
         if episode % args.save_interval == 0 and not args.load_model:
-            # alliance.sacrifice()
+            alliance.sacrifice()
             model.save(run_dir, episode)
             model_o.save(run_dir_o, episode)
             np.save(str(run_dir)+'/reward.npy', np.array(episode_reward))
